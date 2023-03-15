@@ -1,0 +1,31 @@
+{
+  "name": "quitter-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "API for quitter",
+  "main": "server.js",
+  "scripts": {
+    "build": "npx tsc",
+    "start" :"node dist/server.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Just9krish/quitter-api.git"
+  },
+  "author": "just9krish",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Just9krish/quitter-api/issues"
+  },
+  "homepage": "https://github.com/Just9krish/quitter-api#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.15.3",
+    "concurrently": "^7.6.0",
+    "nodemon": "^2.0.21"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
