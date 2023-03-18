@@ -20,6 +20,15 @@ const userSchema = new mongoose.Schema({
 
   name: {
     type: String,
+    default: "Mr. Unknown",
+  },
+
+  profileUrl: {
+    type: String,
+  },
+
+  bannerUrl: {
+    type: String,
   },
 
   followers: [
