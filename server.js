@@ -9,6 +9,9 @@ const morgan = require("morgan");
 
 const app = express();
 
+const port = process.env.PORT || 3000;
+const dbPath = process.env.DBPATH || "mondodb:2731//text";
+
 // middleware
 app.use(morgan("combined"));
 app.use(morgan("dev"));
@@ -28,10 +31,10 @@ app.all("*", async (req, res) => {
 });
 
 mongoose
-  .connect(process.env.DBPATH || "mongodb://localhost/test")
+  .connect(dbPath)
   .then(() =>
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is listening to port ${process.env.PORT}`);
+    app.listen(port, () => {
+      console.log(`Server is listening to port ${port}`);
     })
   )
   .catch((err) => {
