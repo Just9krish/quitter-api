@@ -16,8 +16,15 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("hellow owrd");
+// routes
+const tweetRoutes = require("./routes/tweet.routes");
+
+// tweets routes
+app.use("/tweets", tweetRoutes);
+
+// catch-all route for handling requests to unknown routes
+app.all("*", async (req, res) => {
+  res.status(404).json({ message: "Are you stupid?" });
 });
 
 mongoose
