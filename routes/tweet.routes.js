@@ -7,19 +7,21 @@ const {
   deleteTweet,
 } = require("../controllers/tweet.controller");
 
+const { verifyUser } = require("../middleware/authenticate");
+
 // get all tweets
 router.get("/", getAllTweets);
 
 // create new tweet
-router.post("/", createTweet);
+router.post("/", verifyUser, createTweet);
 
 // get single tweet
 router.get("/:id", findTweet);
 
 //update a tweet
-router.put("/:id", updateTweet);
+router.put("/:id", verifyUser, updateTweet);
 
 // delete a tweet
-router.delete("/:id", deleteTweet);
+router.delete("/:id", verifyUser, deleteTweet);
 
 module.exports = router;
