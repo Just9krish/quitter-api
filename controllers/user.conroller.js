@@ -1,42 +1,37 @@
+const passport = require("passport");
 const User = require("../models/user.model");
 const getToken = require("../helper/creatToken");
-const passport = require("passport");
-const { session } = require("passport");
 
-async function signUpUser(req, res, next) {
-  User.register(
-    new User({ username: req.body.username }),
-    req.body.password,
-    (err, user) => {
-      if (err) {
-        req.status(500).json({ err });
-      } else {
-        if (req.body.name) {
-          user.name = req.body.name;
-        }
-
-        user.save((err, user) => {
-          if (err) {
-            res.status(500).json({ error: err.message });
-          } else {
-            passport.authenticate("local")(req, res, () => {
-              res.status(200).json({
-                message: "Register successfully!",
-              });
-            });
-          }
-        });
-      }
+exports.singUpUser = async (req, res, next) => {
+  try {
+    const user = new User({
+      username: req.body.username,
+      email: req.body.email,
+    });
+    if (req.body.bio) {
+      user.bio = req.body.bio;
     }
-  );
-}
+    await User.register(user, req.body.password);
+    passport.authenticate("local")(req, res, () => {
+      res.status(200).json({
+        status: "Register successfully!",
+        success: true,
+      });
+    });
+  } catch (err) {
+    if (err.name === "UserExistsError") {
+      res.status(409).json({ message: "User already exists" });
+    } else {
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+};
+exports.logInUser = passport.authenticate("local", { session: false });
 
-async function loginUser(req, res, next) {
-  passport.authenticate("local", { session: false });
-}
-
-function sendToken(req, res, next) {
-  const token = getToken(req.user);
-
-  res.status(200).json({ token });
-}
+exports.sendToken = (req, res) => {
+  const token = getToken({ _id: req.user._id });
+  res.status(200).json({
+    token: token,
+  });
+};

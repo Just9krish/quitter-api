@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+const passport = require("passport");
 
 const app = express();
 
@@ -15,12 +16,19 @@ const dbPath = process.env.DBPATH || "mondodb:2731//text";
 // middleware
 app.use(morgan("combined"));
 app.use(morgan("dev"));
-app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // routes
 const tweetRoutes = require("./routes/tweet.routes");
+const userRoutes = require("./routes/user.routes");
+
+app.use(passport.initialize());
+
+app.get("/", (req, res) => res.send("home page"));
+app.use("/user", userRoutes);
+
+app.use(express.static(path.join(__dirname, "public")));
 
 // tweets routes
 app.use("/tweets", tweetRoutes);
