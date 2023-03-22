@@ -1,9 +1,48 @@
 const Tweet = require("../models/tweet.model");
 const ObjectId = require("mongoose").Types.ObjectId;
+const axios = require("axios");
+const imgbbUploader = require("imgbb-uploader");
+
+// async function createTweet(req, res, next) {
+//   req.body.author = req.user._id;
+//   try {
+//     const { author, content } = req.body;
+
+//     if (!author || !content) {
+//       return res
+//         .status(400)
+//         .json({ message: "Author and content are required" });
+//     }
+
+//     const imagesUrls = [];
+//     console.log(req.files);
+
+//     for (const file of req.files) {
+//       const res = await axios.post("https://api.imgbb.com/1/upload", {
+//         key: process.env.IMGBB_KEY,
+//         image: file.buffer.toString("base64"),
+//       });
+
+//       imagesUrls.push(res.data);
+//     }
+
+//     const tweet = await Tweet.create({
+//       author,
+//       content,
+//       images: imagesUrls,
+//     });
+
+//     res.status(201).json({ tweet });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Something went wrong" });
+//   }
+// }
 
 async function createTweet(req, res, next) {
+  req.body.author = req.user._id;
   try {
-    const { author, content, images } = req.body;
+    const { author, content } = req.body;
 
     if (!author || !content) {
       return res
@@ -11,15 +50,31 @@ async function createTweet(req, res, next) {
         .json({ message: "Author and content are required" });
     }
 
+    const imagesUrls = [];
+
+    const uploadPromises = req.files.map((file) => {
+      const opts = {
+        apiKey: process.env.IMGBB_KEY,
+        base64string: file.buffer.toString("base64"),
+      };
+      return imgbbUploader(opts).then((response) => {
+        return response;
+      });
+    });
+
+    imagesUrls.push(...(await Promise.all(uploadPromises)));
+
+    console.log(imagesUrls);
+
     const tweet = await Tweet.create({
       author,
       content,
-      images,
+      images: imagesUrls,
     });
 
     res.status(201).json({ tweet });
   } catch (error) {
-    console.log(err);
+    console.log(error);
     res.status(500).json({ message: "Something went wrong" });
   }
 }

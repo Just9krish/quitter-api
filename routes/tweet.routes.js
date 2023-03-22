@@ -6,6 +6,7 @@ const {
   updateTweet,
   deleteTweet,
 } = require("../controllers/tweet.controller");
+const upload = require("../middleware/upload");
 
 const { verifyUser } = require("../middleware/authenticate");
 
@@ -13,7 +14,7 @@ const { verifyUser } = require("../middleware/authenticate");
 router.get("/", getAllTweets);
 
 // create new tweet
-router.post("/", verifyUser, createTweet);
+router.post("/", verifyUser, upload, createTweet);
 
 // get single tweet
 router.get("/:id", findTweet);

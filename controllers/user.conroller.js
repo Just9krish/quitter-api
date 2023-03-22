@@ -15,7 +15,6 @@ exports.singUpUser = async (req, res, next) => {
     passport.authenticate("local")(req, res, () => {
       res.status(200).json({
         status: "Register successfully!",
-        success: true,
       });
     });
   } catch (err) {
