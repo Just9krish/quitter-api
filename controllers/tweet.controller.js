@@ -1,43 +1,6 @@
 const Tweet = require("../models/tweet.model");
 const ObjectId = require("mongoose").Types.ObjectId;
-const axios = require("axios");
 const imgbbUploader = require("imgbb-uploader");
-
-// async function createTweet(req, res, next) {
-//   req.body.author = req.user._id;
-//   try {
-//     const { author, content } = req.body;
-
-//     if (!author || !content) {
-//       return res
-//         .status(400)
-//         .json({ message: "Author and content are required" });
-//     }
-
-//     const imagesUrls = [];
-//     console.log(req.files);
-
-//     for (const file of req.files) {
-//       const res = await axios.post("https://api.imgbb.com/1/upload", {
-//         key: process.env.IMGBB_KEY,
-//         image: file.buffer.toString("base64"),
-//       });
-
-//       imagesUrls.push(res.data);
-//     }
-
-//     const tweet = await Tweet.create({
-//       author,
-//       content,
-//       images: imagesUrls,
-//     });
-
-//     res.status(201).json({ tweet });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "Something went wrong" });
-//   }
-// }
 
 async function createTweet(req, res, next) {
   req.body.author = req.user._id;
@@ -64,8 +27,6 @@ async function createTweet(req, res, next) {
 
     imagesUrls.push(...(await Promise.all(uploadPromises)));
 
-    console.log(imagesUrls);
-
     const tweet = await Tweet.create({
       author,
       content,
@@ -80,6 +41,7 @@ async function createTweet(req, res, next) {
 }
 
 async function updateTweet(req, res, next) {
+  req.body.author = req.user._id;
   try {
     const { id } = req.params;
 
@@ -87,17 +49,87 @@ async function updateTweet(req, res, next) {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    const { images, content } = req.body;
+    const { content, author } = req.body;
 
-    if (!images || !content) {
+    if (!content || !author) {
       return res
         .status(400)
-        .json({ message: "Both images and content are required" });
+        .json({ message: "content and author are required" });
+    }
+
+    const imagesUrls = [];
+
+    const uploadPromises = req.files.map((file) => {
+      const opts = {
+        apiKey: process.env.IMGBB_KEY,
+        base64string: file.buffer.toString("base64"),
+      };
+      return imgbbUploader(opts).then((response) => {
+        return response;
+      });
+    });
+
+    imagesUrls.push(...(await Promise.all(uploadPromises)));
+
+    const tweet = await Tweet.findByIdAndUpdate(
+      id,
+      { author, content, images: imagesUrls },
+      { new: true }
+    );
+
+    if (!tweet) {
+      return res.status(404).json({ message: "Tweet not found" });
+    }
+
+    res.status(200).json({ tweet });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+}
+
+async function patchTweet(req, res, next) {
+  req.body.author = req.user._id;
+  try {
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Bad request" });
+    }
+
+    const { content, author } = req.body;
+
+    const updatedFields = {};
+
+    if (content) {
+      updatedFields.content = content;
+    }
+
+    if (author) {
+      updatedFields.author = author;
+    }
+
+    if (req.files && req.files.length > 0) {
+      const imagesUrls = [];
+
+      const uploadPromises = req.files.map((file) => {
+        const opts = {
+          apiKey: process.env.IMGBB_KEY,
+          base64string: file.buffer.toString("base64"),
+        };
+        return imgbbUploader(opts).then((response) => {
+          return response;
+        });
+      });
+
+      imagesUrls.push(...(await Promise.all(uploadPromises)));
+
+      updatedFields.images = imagesUrls;
     }
 
     const tweet = await Tweet.findByIdAndUpdate(
       id,
-      { content, images },
+      { $set: updatedFields },
       { new: true }
     );
 
@@ -170,4 +202,5 @@ module.exports = {
   createTweet,
   deleteTweet,
   findTweet,
+  patchTweet,
 };

@@ -5,6 +5,7 @@ const {
   findTweet,
   updateTweet,
   deleteTweet,
+  patchTweet,
 } = require("../controllers/tweet.controller");
 const upload = require("../middleware/upload");
 
@@ -19,8 +20,11 @@ router.post("/", verifyUser, upload, createTweet);
 // get single tweet
 router.get("/:id", findTweet);
 
+// patch a tweet
+router.patch("/:id", verifyUser, upload, patchTweet);
+
 //update a tweet
-router.put("/:id", verifyUser, updateTweet);
+router.put("/:id", verifyUser, upload, updateTweet);
 
 // delete a tweet
 router.delete("/:id", verifyUser, deleteTweet);
