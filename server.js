@@ -22,6 +22,7 @@ app.use(express.json());
 // routes
 const tweetRoutes = require("./routes/tweet.routes");
 const userRoutes = require("./routes/user.routes");
+const hashRoutes = require("./routes/hashtag.routes");
 
 app.use(passport.initialize());
 
@@ -29,6 +30,8 @@ app.get("/", (req, res) => res.send("home page"));
 app.use("/user", userRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/hash", hashRoutes);
 
 // tweets routes
 app.use("/tweets", tweetRoutes);

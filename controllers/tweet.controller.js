@@ -1,6 +1,7 @@
 const Tweet = require("../models/tweet.model");
 const ObjectId = require("mongoose").Types.ObjectId;
 const imgbbUploader = require("imgbb-uploader");
+const { findHashTag } = require("../helper/findHashTag");
 
 async function createTweet(req, res, next) {
   req.body.author = req.user._id;
@@ -33,6 +34,7 @@ async function createTweet(req, res, next) {
       images: imagesUrls,
     });
 
+    findHashTag(content, tweet);
     res.status(201).json({ tweet });
   } catch (error) {
     console.log(error);
