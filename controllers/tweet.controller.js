@@ -45,9 +45,9 @@ async function createTweet(req, res, next) {
 async function updateTweet(req, res, next) {
   req.body.author = req.user._id;
   try {
-    const { id } = req.params;
+    const { tweetId } = req.params;
 
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(tweetId)) {
       return res.status(400).json({ message: "Bad request" });
     }
 
@@ -74,7 +74,7 @@ async function updateTweet(req, res, next) {
     imagesUrls.push(...(await Promise.all(uploadPromises)));
 
     const tweet = await Tweet.findByIdAndUpdate(
-      id,
+      tweetId,
       { author, content, images: imagesUrls },
       { new: true }
     );
@@ -93,9 +93,9 @@ async function updateTweet(req, res, next) {
 async function patchTweet(req, res, next) {
   req.body.author = req.user._id;
   try {
-    const { id } = req.params;
+    const { tweetId } = req.params;
 
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(tweetId)) {
       return res.status(400).json({ message: "Bad request" });
     }
 
@@ -130,7 +130,7 @@ async function patchTweet(req, res, next) {
     }
 
     const tweet = await Tweet.findByIdAndUpdate(
-      id,
+      tweetId,
       { $set: updatedFields },
       { new: true }
     );
@@ -148,13 +148,13 @@ async function patchTweet(req, res, next) {
 
 async function deleteTweet(req, res, next) {
   try {
-    const { id } = req.params;
+    const { tweetId } = req.params;
 
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(tweetId)) {
       return res.status(400).json({ message: "Invalid tweet ID" });
     }
 
-    const deletedTweet = await Tweet.findByIdAndDelete(id);
+    const deletedTweet = await Tweet.findByIdAndDelete(tweetId);
 
     if (!deletedTweet) {
       return res.status(404).json({ message: "Tweet not found" });
@@ -169,13 +169,13 @@ async function deleteTweet(req, res, next) {
 
 async function findTweet(req, res, next) {
   try {
-    const { id } = req.params;
+    const { tweetId } = req.params;
 
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(tweetId)) {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    const tweet = await Tweet.findOne({ _id: id });
+    const tweet = await Tweet.findOne({ _id: tweetId }).populate("author");
 
     if (!tweet) {
       return res.status(404).json({ message: "tweet is not found" });
@@ -190,7 +190,7 @@ async function findTweet(req, res, next) {
 
 async function getAllTweets(req, res, next) {
   try {
-    const tweets = await Tweet.find();
+    const tweets = await Tweet.find().populate("author");
     res.json(tweets);
   } catch (error) {
     console.error(error);

@@ -1,5 +1,4 @@
 var router = require("express").Router();
-const User = require("../models/user.model");
 const { verifyUser, verifyAdmin } = require("../middleware/authenticate");
 const {
   singUpUser,
@@ -13,8 +12,10 @@ const {
 /* GET users listing. */
 router.get("/", verifyUser, verifyAdmin, getUsers);
 
+// follow user
 router.post("/:userId/follow", verifyUser, followUser);
 
+// unfollow user
 router.post("/:userId/unfollow", verifyUser, unfollowUser);
 
 // Singup route

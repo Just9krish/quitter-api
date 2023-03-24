@@ -8,6 +8,10 @@ const {
   patchTweet,
 } = require("../controllers/tweet.controller");
 const upload = require("../middleware/upload");
+const {
+  getTweetAllReplies,
+  postReplyInTweet,
+} = require("../controllers/tweetReplies.controller");
 
 const { verifyUser } = require("../middleware/authenticate");
 
@@ -18,15 +22,21 @@ router.get("/", getAllTweets);
 router.post("/", verifyUser, upload, createTweet);
 
 // get single tweet
-router.get("/:id", findTweet);
+router.get("/:tweetId", findTweet);
 
 // patch a tweet
-router.patch("/:id", verifyUser, upload, patchTweet);
+router.patch("/:tweetId", verifyUser, upload, patchTweet);
 
 //update a tweet
-router.put("/:id", verifyUser, upload, updateTweet);
+router.put("/:tweetId", verifyUser, upload, updateTweet);
 
 // delete a tweet
-router.delete("/:id", verifyUser, deleteTweet);
+router.delete("/:tweetId", verifyUser, deleteTweet);
+
+// -------- tweet replies routes ----------- //
+
+router.get("/:tweetId/replies", getTweetAllReplies);
+
+router.post("/:tweetId/replies", verifyUser, postReplyInTweet);
 
 module.exports = router;
