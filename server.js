@@ -31,10 +31,11 @@ app.use("/user", userRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/hash", hashRoutes);
-
 // tweets routes
 app.use("/tweets", tweetRoutes);
+
+// hashtag route
+app.use("/hash", hashRoutes);
 
 // catch-all route for handling requests to unknown routes
 app.all("*", async (req, res) => {

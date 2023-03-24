@@ -6,10 +6,16 @@ const {
   sendToken,
   logInUser,
   getUsers,
+  followUser,
+  unfollowUser,
 } = require("../controllers/user.conroller");
 
 /* GET users listing. */
 router.get("/", verifyUser, verifyAdmin, getUsers);
+
+router.post("/:userId/follow", verifyUser, followUser);
+
+router.post("/:userId/unfollow", verifyUser, unfollowUser);
 
 // Singup route
 router.post("/signup", singUpUser);

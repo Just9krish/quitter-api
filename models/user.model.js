@@ -13,27 +13,30 @@ const userSchema = new mongoose.Schema({
     default: "Mr. Unknown",
   },
 
-  // profileUrl: {
-  //   type: String,
-  // },
+  profileUrl: {
+    type: String,
+    default: "https://i.ibb.co/kK2JV13/Png-Item-1503945.png",
+  },
 
-  // bannerUrl: {
-  //   type: String,
-  // },
+  bannerUrl: {
+    type: String,
+    default:
+      "https://i.ibb.co/4ST75gJ/banner-full-blue-scratch-jpg-twimg-1280.jpg",
+  },
 
-  // followers: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "User",
-  //   },
-  // ],
+  followers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 
-  // followings: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "User",
-  //   },
-  // ],
+  followings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 
   bio: {
     type: String,
@@ -57,5 +60,27 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.plugin(passportLocalMongoose);
+
+userSchema.statics.followUser = async function (followerId, followeeId) {
+  const follower = await this.findById(followerId);
+  const followee = await this.findById(followeeId);
+
+  follower.followings.push(followeeId);
+  followee.followers.push(followerId);
+
+  await follower.save();
+  await followee.save();
+};
+
+userSchema.statics.unfollowUser = async function (followerId, followeeId) {
+  const follower = await this.findById(followerId);
+  const followee = await this.findById(followeeId);
+
+  follower.followings.pull(followeeId);
+  followee.followers.pull(followerId);
+
+  await follower.save();
+  await followee.save();
+};
 
 module.exports = mongoose.model("User", userSchema);
