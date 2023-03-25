@@ -12,9 +12,9 @@ exports.getTweetAllReplies = async (req, res, next) => {
     const tweet = await Tweet.findById(tweetId)
       .populate({
         path: "replies",
-        populate: { path: "author", select: "username avatar" },
+        populate: { path: "author", select: "username profileUrl" },
       })
-      .populate("author", "username avatar");
+      .populate("author", "username profileUrl");
 
     if (!tweet) {
       return res.status(404).json({ message: "Tweet not found" });
@@ -51,9 +51,9 @@ exports.postReplyInTweet = async (req, res, next) => {
     const populatedTweet = await Tweet.findById(tweetId)
       .populate({
         path: "replies",
-        populate: { path: "author", select: "username avatar" },
+        populate: { path: "author", select: "username profileUrl" },
       })
-      .populate("author", "username avatar");
+      .populate("author", "username profileUrl");
 
     res.status(201).json(populatedTweet);
   } catch (error) {

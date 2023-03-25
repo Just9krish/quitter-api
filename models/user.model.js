@@ -65,22 +65,41 @@ userSchema.statics.followUser = async function (followerId, followeeId) {
   const follower = await this.findById(followerId);
   const followee = await this.findById(followeeId);
 
+  // Check if follower is already following the followee
+  if (
+    follower.followings.includes(followeeId) &&
+    followee.followers.includes(followerId)
+  ) {
+    return { message: "You are already following this user." };
+  }
+
   follower.followings.push(followeeId);
   followee.followers.push(followerId);
 
   await follower.save();
   await followee.save();
+
+  return { message: "You are now following this user." };
 };
 
 userSchema.statics.unfollowUser = async function (followerId, followeeId) {
   const follower = await this.findById(followerId);
   const followee = await this.findById(followeeId);
 
-  follower.followings.pull(followeeId);
-  followee.followers.pull(followerId);
+  if (
+    follower.followings.includes(followeeId) &&
+    followee.followers.includes(followerId)
+  ) {
+    follower.followings.pull(followeeId);
+    followee.followers.pull(followerId);
 
-  await follower.save();
-  await followee.save();
+    await follower.save();
+    await followee.save();
+
+    return { message: "Unfollowed successfully" };
+  } else {
+    return { error: "User is not following this account" };
+  }
 };
 
 module.exports = mongoose.model("User", userSchema);
