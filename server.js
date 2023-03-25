@@ -27,7 +27,7 @@ const hashRoutes = require("./routes/hashtag.routes");
 app.use(passport.initialize());
 
 app.get("/", (req, res) => res.send("home page"));
-app.use("/user", userRoutes);
+app.use("/users", userRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
 

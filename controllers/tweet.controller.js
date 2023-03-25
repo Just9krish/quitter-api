@@ -3,6 +3,18 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const imgbbUploader = require("imgbb-uploader");
 const { findHashTag } = require("../helper/findHashTag");
 
+// get all tweets
+async function getAllTweets(req, res, next) {
+  try {
+    const tweets = await Tweet.find().populate("author");
+    res.json(tweets);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+}
+
+// create a new tweet
 async function createTweet(req, res, next) {
   req.body.author = req.user._id;
   try {
@@ -39,6 +51,19 @@ async function createTweet(req, res, next) {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Something went wrong" });
+  }
+}
+
+async function deleteAllTweets(req, res, next) {
+  try {
+    const { deletedCount } = await Tweet.deleteMany({});
+    if (deletedCount === 0) {
+      return res.status(404).json({ message: "No tweets found" });
+    }
+    return res.status(200).json({ message: "All tweets are deleted" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
@@ -188,16 +213,6 @@ async function findTweet(req, res, next) {
   }
 }
 
-async function getAllTweets(req, res, next) {
-  try {
-    const tweets = await Tweet.find().populate("author");
-    res.json(tweets);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Something went wrong" });
-  }
-}
-
 module.exports = {
   getAllTweets,
   updateTweet,
@@ -205,4 +220,5 @@ module.exports = {
   deleteTweet,
   findTweet,
   patchTweet,
+  deleteAllTweets,
 };
