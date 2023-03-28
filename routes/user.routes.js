@@ -7,10 +7,18 @@ const {
   getUsers,
   followUser,
   unfollowUser,
+  updateUser,
+  partiallyUpdateUser,
 } = require("../controllers/user.conroller");
 
 /* GET users listing. */
 router.get("/", verifyUser, verifyAdmin, getUsers);
+
+// completly update user
+router.put("/", verifyUser, updateUser);
+
+// partially update user
+router.put("/", verifyUser, partiallyUpdateUser);
 
 // follow user
 router.post("/:userId/follow", verifyUser, followUser);
