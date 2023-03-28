@@ -23,6 +23,7 @@ app.use(express.json());
 const tweetRoutes = require("./routes/tweet.routes");
 const userRoutes = require("./routes/user.routes");
 const hashRoutes = require("./routes/hashtag.routes");
+const searchRoutes = require("./routes/search.routes");
 
 app.use(passport.initialize());
 
@@ -36,6 +37,8 @@ app.use("/tweets", tweetRoutes);
 
 // hashtag route
 app.use("/hash", hashRoutes);
+
+app.use("/api", searchRoutes);
 
 // catch-all route for handling requests to unknown routes
 app.all("*", async (req, res) => {
