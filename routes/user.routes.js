@@ -18,7 +18,7 @@ router.get("/", verifyUser, verifyAdmin, getUsers);
 router.put("/", verifyUser, updateUser);
 
 // partially update user
-router.put("/", verifyUser, partiallyUpdateUser);
+router.patch("/", verifyUser, partiallyUpdateUser);
 
 // follow user
 router.post("/:userId/follow", verifyUser, followUser);
