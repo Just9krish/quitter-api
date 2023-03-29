@@ -10,7 +10,7 @@ async function getAllTweets(req, res, next) {
     res.json(tweets);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -50,7 +50,7 @@ async function createTweet(req, res, next) {
     res.status(201).json({ tweet });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -209,7 +209,63 @@ async function findTweet(req, res, next) {
     res.status(200).json({ tweet });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function handleLike(req, res, next) {
+  try {
+    const { tweetId } = req.params;
+    const userId = req.user._id;
+
+    if (!ObjectId.isValid(tweetId)) {
+      return res.status(400).json({ message: "Bad request" });
+    }
+
+    const tweet = await Tweet.findById(tweetId);
+
+    if (!tweet) {
+      return res.status(404).json({ message: "Tweet not found" });
+    }
+
+    const liked = tweet.likes.includes(userId);
+
+    if (liked) {
+      // Remove user ID from likes array
+      await Tweet.findByIdAndUpdate(tweetId, { $pull: { likes: userId } });
+      res.status(200).json({ message: "Like removed" });
+    } else {
+      // Add user ID to likes array
+      await Tweet.findByIdAndUpdate(tweetId, { $addToSet: { likes: userId } });
+      res.status(200).json({ message: "Tweet liked" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function getAllLikes(req, res, next) {
+  try {
+    const { tweetId } = req.params;
+
+    if (!ObjectId.isValid(tweetId)) {
+      return res.status(400).json({ message: "Bad request" });
+    }
+
+    const tweet = await Tweet.findById(tweetId).populate({
+      path: "likes",
+      select: "username name profileUrl",
+    });
+
+    if (!tweet) {
+      return res.status(404).json({ message: "Tweet not found" });
+    }
+
+    res.status(400).json({ likes: tweet.likes });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -221,4 +277,6 @@ module.exports = {
   findTweet,
   patchTweet,
   deleteAllTweets,
+  handleLike,
+  getAllLikes,
 };

@@ -7,6 +7,8 @@ const {
   deleteTweet,
   patchTweet,
   deleteAllTweets,
+  handleLike,
+  getAllLikes,
 } = require("../controllers/tweet.controller");
 const upload = require("../middleware/upload");
 const {
@@ -93,5 +95,13 @@ router.put("/:tweetId/replies/:replyId", verifyUser, updateReplyOfTweet);
 
 // delete the single reply of tweet
 router.delete("/:tweetId/replies/:replyId", verifyUser, deleteReplyOfTweet);
+
+// -------- tweet like routes ----------- //
+
+// get all likes
+router.get("/:tweetId/like", getAllLikes);
+
+// post like and unlike post
+router.patch("/:tweetId/like", verifyUser, handleLike);
 
 module.exports = router;
