@@ -28,17 +28,19 @@ async function createTweet(req, res, next) {
 
     const imagesUrls = [];
 
-    const uploadPromises = req.files.map((file) => {
-      const opts = {
-        apiKey: process.env.IMGBB_KEY,
-        base64string: file.buffer.toString("base64"),
-      };
-      return imgbbUploader(opts).then((response) => {
-        return response;
+    if (req.files) {
+      const uploadPromises = req.files.map((file) => {
+        const opts = {
+          apiKey: process.env.IMGBB_KEY,
+          base64string: file.buffer.toString("base64"),
+        };
+        return imgbbUploader(opts).then((response) => {
+          return response;
+        });
       });
-    });
 
-    imagesUrls.push(...(await Promise.all(uploadPromises)));
+      imagesUrls.push(...(await Promise.all(uploadPromises)));
+    }
 
     const tweet = await Tweet.create({
       author,
@@ -47,7 +49,7 @@ async function createTweet(req, res, next) {
     });
 
     findHashTag(content, tweet);
-    res.status(201).json({ tweet });
+    res.status(201).json(tweet);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
@@ -86,17 +88,19 @@ async function updateTweet(req, res, next) {
 
     const imagesUrls = [];
 
-    const uploadPromises = req.files.map((file) => {
-      const opts = {
-        apiKey: process.env.IMGBB_KEY,
-        base64string: file.buffer.toString("base64"),
-      };
-      return imgbbUploader(opts).then((response) => {
-        return response;
+    if (req.files) {
+      const uploadPromises = req.files.map((file) => {
+        const opts = {
+          apiKey: process.env.IMGBB_KEY,
+          base64string: file.buffer.toString("base64"),
+        };
+        return imgbbUploader(opts).then((response) => {
+          return response;
+        });
       });
-    });
 
-    imagesUrls.push(...(await Promise.all(uploadPromises)));
+      imagesUrls.push(...(await Promise.all(uploadPromises)));
+    }
 
     const tweet = await Tweet.findByIdAndUpdate(
       tweetId,
@@ -108,7 +112,7 @@ async function updateTweet(req, res, next) {
       return res.status(404).json({ message: "Tweet not found" });
     }
 
-    res.status(200).json({ tweet });
+    res.status(200).json(tweet);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Something went wrong" });
@@ -206,7 +210,7 @@ async function findTweet(req, res, next) {
       return res.status(404).json({ message: "tweet is not found" });
     }
 
-    res.status(200).json({ tweet });
+    res.status(200).json(tweet);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
