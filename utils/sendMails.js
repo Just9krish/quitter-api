@@ -22,6 +22,7 @@ exports.sendEmail = async (
     tls: { rejectUnauthorized: false },
   });
 
+  // configure the node-mailer-handlebars
   const handlearOptions = {
     viewEngine: {
       extName: ".handlebars",
@@ -35,7 +36,6 @@ exports.sendEmail = async (
   transporter.use("compile", hbs(handlearOptions));
 
   // options for sending mail
-
   const options = {
     from: sentFrom,
     to: sendTo,
